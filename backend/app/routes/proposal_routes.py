@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from .user_routes import token_required
-from models import Proposal, ProposalStatus, UserRole, db, Consult
+from models import Proposal, ProposalStatus, UserRole, db, Consult, ConsultStatus, ConsultAssignment
 from datetime import datetime
 
 
@@ -68,14 +68,16 @@ def create_proposal_bp():
             if p.id != proposal_id:
                 p.status = ProposalStatus.REJECTED
 
-        # Assign the consult to the lawyer
-        from models import ConsultAssignment
-        assignment = ConsultAssignment(consult_id=consult.id, lawyer_id=proposal.lawyer_id)
-        db.session.add(assignment)
+        assignment = ConsultAssignment.query.filter_by(consult_id=consult.id).first()
+        if assignment:
+            assignment.lawyer_id = proposal.lawyer_id
+            assignment.status = 'active'
+        else:
+            assignment = ConsultAssignment(consult_id=consult.id, lawyer_id=proposal.lawyer_id)
+            db.session.add(assignment)
 
-        # Make consult private
         consult.is_public = False
-        consult.status = 'assigned'
+        consult.status = ConsultStatus.ASSIGNED
 
         db.session.commit()
         return jsonify({'message': 'Proposal accepted and consult assigned'}), 200

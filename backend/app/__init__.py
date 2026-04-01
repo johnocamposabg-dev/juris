@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, redirect, url_for
 from flask_cors import CORS
 from models import db
 import bcrypt
@@ -13,6 +13,7 @@ def create_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///juris.db'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY', 'change_this_secret_to_a_secure_random_string')
+    app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', app.config['JWT_SECRET_KEY'])
     app.config['JWT_ALGORITHM'] = 'HS256'
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = 7200  
     
@@ -25,11 +26,21 @@ def create_app():
         create_admin_user()
     
     from app.routes import user_bp, matter_bp, consult_bp, assignment_bp, proposal_bp
+    from app.admin import init_admin
     app.register_blueprint(user_bp, url_prefix='/api')
     app.register_blueprint(matter_bp, url_prefix='/api')
     app.register_blueprint(consult_bp, url_prefix='/api')
     app.register_blueprint(assignment_bp, url_prefix='/api')
     app.register_blueprint(proposal_bp, url_prefix='/api')
+    init_admin(app)
+
+    @app.get('/')
+    def root():
+        return redirect(url_for('admin_login_form'))
+
+    @app.get('/api/health')
+    def health_check():
+        return {'status': 'ok'}, 200
     
     @app.errorhandler(404)
     def not_found(error):

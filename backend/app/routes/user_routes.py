@@ -95,7 +95,8 @@ def create_user_bp():
         password = data.get("password")
 
         if email:
-            if User.query.filter_by(email=email).first():
+            existing_user = User.query.filter_by(email=email).first()
+            if existing_user and existing_user.id != user.id:
                 return jsonify({"error": "Email already exists"}), 400
             user.email = email
         
@@ -123,10 +124,10 @@ def create_user_bp():
 
         return jsonify({"message": "User deleted successfully"}), 200
     
-    @user_bp.route('/users', methods=['GET'])
+    @user_bp.route('', methods=['GET'])
     @token_required
     @admin_required
-    def list_users():
+    def list_users(current_user):
         users = User.query.all()
         return jsonify([{
             "user_id": user.id,
@@ -275,7 +276,7 @@ def create_user_bp():
     @user_bp.route('/create/staff', methods=['POST'])
     @token_required
     @admin_required
-    def create_staff():
+    def create_staff(current_user):
         data = request.get_json()
         
         if not data:
@@ -291,7 +292,7 @@ def create_user_bp():
             return jsonify({"error": "Email already exists"}), 400
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
-        new_user = User(email=email, password=hashed_password, role=UserRole.STAFF)
+        new_user = User(email=email, password=hashed_password, role=UserRole.LAWYER)
         db.session.add(new_user)
         db.session.commit()
 

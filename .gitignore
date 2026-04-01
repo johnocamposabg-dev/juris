@@ -1,28 +1,76 @@
-# Node
+# =========================
+# OS / Editor
+# =========================
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtualenvs
+.venv/
+venv/
+env/
+ENV/
+
+# Tool caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Packaging
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# =========================
+# Node / React
+# =========================
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
-yarn.lock
+pnpm-debug.log*
 
-# Build output
+# Build outputs
 build/
 dist/
 
-# Environment
+# Test / coverage
+coverage/
+
+# =========================
+# Environments / secrets
+# =========================
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!backend/.env.example
+!frontend/.env.example
 
-# Python
-__pycache__/
-*.py[cod]
-*.egg-info/
-venv/
+# =========================
+# Runtime files
+# =========================
+*.log
+*.pid
 
-# IDE / OS
-.DS_Store
-Thumbs.db
-.vscode/
-.idea/
+# Local databases
+*.db
+*.sqlite
+*.sqlite3
+
+# =========================
+# Optional local config
+# =========================
+.python-version
